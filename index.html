@@ -1,0 +1,142 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f7f8fc">
+<title>أفق AI | مساعدك الذكي</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Tahoma,sans-serif;background:#f7f8fc;color:#202438}
+header{background:#fff;padding:18px 16px;border-bottom:1px solid #e5e7ef;position:sticky;top:0}
+.logo{font-size:25px;font-weight:bold;color:#6754db}
+.logo span{color:#202438}
+header p{margin:7px 0 0;color:#777;font-size:13px}
+main{max-width:760px;margin:auto;padding:18px 14px}
+.welcome{background:linear-gradient(135deg,#6d5ce8,#3987e8);color:white;padding:24px;border-radius:22px;margin-bottom:18px}
+.welcome h1{margin:0 0 10px;font-size:25px}
+.welcome p{line-height:1.8;margin:0}
+#chat{display:flex;flex-direction:column;gap:12px;padding-bottom:16px}
+.msg{padding:13px 15px;border-radius:17px;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere;max-width:92%}
+.user{align-self:flex-start;background:#e5e0ff}
+.bot{align-self:flex-end;background:white;border:1px solid #e7e8f0}
+form{position:sticky;bottom:0;background:#f7f8fc;padding:10px 0 14px}
+.composer{display:flex;gap:8px;background:white;border:1px solid #dddfee;border-radius:18px;padding:8px}
+textarea{resize:vertical;min-height:48px;max-height:150px;flex:1;border:0;outline:0;font:16px Arial;padding:12px;background:transparent}
+button{border:0;border-radius:13px;padding:12px 15px;font-size:15px;cursor:pointer}
+#send{background:#6754db;color:white;font-weight:bold}
+#mic{background:#eeeaff;color:#5847bd}
+.note{font-size:12px;color:#777;text-align:center;line-height:1.7}
+.tools{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}
+.tools button{background:white;border:1px solid #e1e2ee;color:#45465b}
+footer{text-align:center;color:#888;font-size:12px;padding:15px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">أفق <span>AI</span> ✦</div>
+  <p>مساعدك الذكي — المعرفة تبدأ من هنا</p>
+</header>
+<main>
+  <section class="welcome">
+    <h1>أهلًا بك في أفق AI 👋</h1>
+    <p>اسأل، تعلّم، اكتب، واكتشف أفكارًا جديدة. أنا هنا لمساعدتك باللغة العربية.</p>
+  </section>
+
+  <div id="chat" aria-live="polite">
+    <div class="msg bot">مرحبًا! أنا أفق AI. 😊
+اكتب سؤالك في الأسفل لنبدأ!</div>
+  </div>
+
+  <div class="tools">
+    <button type="button" id="clear">🗑️ محادثة جديدة</button>
+    <button type="button" id="speak">🔊 قراءة آخر رد</button>
+  </div>
+
+  <form id="form">
+    <div class="composer">
+      <textarea id="question" placeholder="اكتب سؤالك هنا..." aria-label="سؤالك" required></textarea>
+      <button id="mic" type="button" title="إملاء صوتي">🎙️</button>
+      <button id="send" type="submit">إرسال</button>
+    </div>
+  </form>
+  <p class="note">هذه نسخة تجريبية للواجهة. الإجابات الذكية الحقيقية تحتاج إلى ربط خدمة AI.</p>
+</main>
+<footer>أفق AI © 2026</footer>
+
+<script>
+const chat = document.getElementById('chat');
+const form = document.getElementById('form');
+const input = document.getElementById('question');
+let lastReply = 'مرحبًا بك في أفق AI!';
+
+function addMessage(text, who) {
+  const div = document.createElement('div');
+  div.className = 'msg ' + who;
+  div.textContent = text;
+  chat.appendChild(div);
+  div.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function demoReply(text) {
+  const q = text.toLowerCase();
+  if (q.includes('السلام') || q.includes('سلام') || q.includes('مرحبا'))
+    return 'وعليكم السلام ورحمة الله وبركاته! 👋 مرحبًا بك في أفق AI.';
+  if (q.includes('اسمك'))
+    return 'أنا أفق AI، مساعدك الذكي. 😊';
+  if (q.includes('الجزائر'))
+    return 'الجزائر بلد جميل في شمال إفريقيا، وعاصمته مدينة الجزائر. 🇩🇿';
+  return 'وصل سؤالك بنجاح! 😊\\n\\nهذه النسخة تعرض الواجهة فقط، ولم يتم ربط نموذج ذكاء اصطناعي حقيقي بعد. في الخطوة التالية سنربط أفق AI بخدمة Gemini عبر خادم آمن.';
+}
+
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+  const text = input.value.trim();
+  if (!text) return;
+  addMessage(text, 'user');
+  input.value = '';
+  const reply = demoReply(text);
+  lastReply = reply;
+  addMessage(reply, 'bot');
+});
+
+document.getElementById('clear').addEventListener('click', function() {
+  chat.replaceChildren();
+  lastReply = '';
+  addMessage('بدأنا محادثة جديدة! كيف نقدر نساعدك؟', 'bot');
+});
+
+document.getElementById('speak').addEventListener('click', function() {
+  if (!('speechSynthesis' in window)) {
+    alert('المتصفح لا يدعم قراءة النص بالصوت.');
+    return;
+  }
+  if (lastReply) {
+    speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(lastReply);
+    utterance.lang = 'ar';
+    speechSynthesis.speak(utterance);
+  }
+});
+
+document.getElementById('mic').addEventListener('click', function() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert('الإملاء الصوتي غير متاح في هذا المتصفح. يمكنك استخدام ميكروفون لوحة المفاتيح.');
+    return;
+  }
+  const recognition = new SpeechRecognition();
+  recognition.lang = 'ar-DZ';
+  recognition.onresult = function(event) {
+    input.value = event.results[0][0].transcript;
+    input.focus();
+  };
+  recognition.onerror = function() {
+    alert('لم نتمكن من تسجيل الصوت. تأكد من السماح للمتصفح باستخدام الميكروفون.');
+  };
+  recognition.start();
+});
+</script>
+</body>
+</html>
